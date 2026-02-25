@@ -1,43 +1,52 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import LoginScreen from "../screens/LoginScreen";
 import HomeScreen from "../screens/HomeScreen";
 import FavoritesScreen from "../screens/FavoritesScreen";
 import ProductDetailsScreen from "../screens/ProductDetailsScreen";
+import { logout } from "../redux/slices/authSlice";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+/* Bottom Tabs */
+
 function MainTabs() {
+  const dispatch = useDispatch();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarShowLabel: true,
+
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => dispatch(logout())}
+            style={{ marginRight: 15 }}
+          >
+            <Ionicons name="log-out-outline" size={24} />
+          </TouchableOpacity>
+        ),
+
         tabBarActiveTintColor: "#4A90E2",
         tabBarInactiveTintColor: "gray",
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.label,
-        tabBarIcon: ({ color, size, focused }) => {
+
+        tabBarIcon: ({ color }) => {
           let iconName;
 
           if (route.name === "Home") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = "home-outline";
           } else if (route.name === "Favorites") {
-            iconName = focused ? "heart" : "heart-outline";
+            iconName = "heart-outline";
           }
 
-          return (
-            <View style={styles.iconContainer}>
-              <Ionicons name={iconName} size={22} color={color} />
-            </View>
-          );
+          return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
@@ -46,6 +55,8 @@ function MainTabs() {
     </Tab.Navigator>
   );
 }
+
+/* Root Navigator */
 
 export default function AppNavigator() {
   const isLoggedIn = useSelector(
@@ -70,24 +81,3 @@ export default function AppNavigator() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  tabBar: {
-    height: 70,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    position: "absolute",
-    backgroundColor: "#ffffff",
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-  label: {
-    fontSize: 12,
-    marginBottom: 5,
-  },
-  iconContainer: {
-    marginTop: 5,
-  },
-});

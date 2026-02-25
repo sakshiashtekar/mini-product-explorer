@@ -18,10 +18,13 @@ import {
   setSearchQuery,
   setCategory,
 } from "../redux/slices/productSlice";
+import { logout } from "../redux/slices/authSlice";
 import CategoryFilter from "../components/CategoryFilter";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
+
   const {
     filteredItems,
     items,
@@ -50,7 +53,7 @@ export default function HomeScreen({ navigation }) {
 
   if (loading && items.length === 0) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={["top"]}>
         <ActivityIndicator size="large" />
       </SafeAreaView>
     );
@@ -58,7 +61,7 @@ export default function HomeScreen({ navigation }) {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView style={styles.center} edges={["top"]}>
         <Text>{error}</Text>
         <Button
           title="Retry"
@@ -69,7 +72,21 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      {/* Top Bar */}
+      <View style={styles.topRow}>
+        <Text style={styles.screenTitle}>Home</Text>
+
+        <TouchableOpacity onPress={() => dispatch(logout())}>
+          <Ionicons
+            name="log-out-outline"
+            size={24}
+            color="#000"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Search */}
       <TextInput
         placeholder="Search products..."
         value={searchQuery}
@@ -79,12 +96,14 @@ export default function HomeScreen({ navigation }) {
         style={styles.search}
       />
 
+      {/* Category Filter */}
       <CategoryFilter
         categories={categories}
         selected={selectedCategory}
         onSelect={(cat) => dispatch(setCategory(cat))}
       />
 
+      {/* Product List */}
       <FlatList
         data={filteredItems}
         keyExtractor={(item) => item.id.toString()}
@@ -94,6 +113,7 @@ export default function HomeScreen({ navigation }) {
             onRefresh={onRefresh}
           />
         }
+        contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -126,7 +146,24 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#f2f2f2" },
+  safe: {
+    flex: 1,
+    backgroundColor: "#f2f2f2",
+  },
+
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginTop: 10,
+  },
+
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
   search: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -135,6 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
   },
+
   card: {
     flexDirection: "row",
     backgroundColor: "#fff",
@@ -144,19 +182,33 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 4,
   },
+
   image: {
     width: 90,
     height: 90,
     resizeMode: "contain",
   },
-  info: { flex: 1, marginLeft: 15 },
-  title: { fontWeight: "600" },
+
+  info: {
+    flex: 1,
+    marginLeft: 15,
+  },
+
+  title: {
+    fontWeight: "600",
+  },
+
   price: {
     fontWeight: "bold",
     color: "#4A90E2",
     marginVertical: 5,
   },
-  category: { fontSize: 12, color: "gray" },
+
+  category: {
+    fontSize: 12,
+    color: "gray",
+  },
+
   center: {
     flex: 1,
     justifyContent: "center",

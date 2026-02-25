@@ -35,6 +35,9 @@ export default function FavoritesScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <View style={styles.topRow}>
+        <Text style={styles.screenTitle}>Favorites</Text>
+      </View>
       <FlatList
         contentContainerStyle={{ padding: 15 }}
         data={favorites}
@@ -128,5 +131,18 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: "gray",
+  },
+
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginTop: 10,
+  },
+
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
