@@ -1,27 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { loginApi } from "../../services/authService";
 
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
+  "auth/loginUser",
   async ({ username, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        'https://dummyjson.com/auth/login',
-        {
-          username,
-          password,
-          expiresInMins: 1440,
-        }
-      );
-      return response.data;
+      return await loginApi(username, password);
     } catch (error) {
-      return rejectWithValue('Invalid credentials');
+      return rejectWithValue("Login failed");
     }
   }
 );
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: {
     token: null,
     isLoggedIn: false,
@@ -29,14 +21,14 @@ const authSlice = createSlice({
     error: null,
   },
   reducers: {
-    logout: state => {
+    logout: (state) => {
       state.token = null;
       state.isLoggedIn = false;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, state => {
+      .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -45,9 +37,9 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isLoggedIn = true;
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = "Invalid credentials";
       });
   },
 });
